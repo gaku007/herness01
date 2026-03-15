@@ -1,10 +1,15 @@
 """Tests for hello module."""
 
-from src.hello import main
+from src.hello import hello
 
 
-def test_main_prints_hello_world(capsys: object) -> None:
-    """Test that main() prints Hello World."""
-    main()
-    captured = capsys.readouterr()
-    assert captured.out == "Hello World\n"
+def test_hello_returns_correct_message() -> None:
+    """Test that hello function returns 'Hello World'."""
+    result = hello()
+    assert result == "Hello World", f"Expected 'Hello World', got '{result}'"
+
+
+def test_hello_is_string() -> None:
+    """Test that hello function returns a string."""
+    result = hello()
+    assert isinstance(result, str), f"Expected str, got {type(result)}"

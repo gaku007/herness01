@@ -1,10 +1,14 @@
 """Hello World module."""
 
 
-def main() -> None:
-    """Print Hello World."""
-    print("Hello World")
+def hello() -> str:
+    """Return 'Hello World' string.
+
+    Returns:
+        str: The message "Hello World"
+    """
+    return "Hello World"
 
 
 if __name__ == "__main__":
-    main()
+    print(hello())
