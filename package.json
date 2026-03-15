@@ -1,0 +1,19 @@
+{
+  "name": "herness01",
+  "version": "0.1.0",
+  "description": "FastAPI ベースの API 開発",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/hello.ts",
+    "start": "node dist/hello.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "@types/node": "^20.11.0"
+  }
+}

@@ -1,12 +1,12 @@
 # Current task plan
 
 ## Goal
-pythonを実行すると"Hello World"と表示される
+Issue #5: TypeScript で Hello World を出力するコードを作成し、実行時に標準出力に "Hello World" が表示される
 
 ## Files to change
-- src/hello.py
-- tests/test_hello.py
+- src/hello.ts (新規): TypeScript のエントリーポイント
+- tests/test_hello.py (新規): PyTest でのテスト実装
 
 ## Risks
-- 既存レスポンス形式を変えない
-- 既存テストを壊さない
+- TypeScript 実行環境の確認が必要
+- 既存テストとの干渉がないか確認
