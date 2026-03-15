@@ -24,6 +24,7 @@
 6. 失敗したら修正
 7. 必要最低限のファイルだけpushするために.gitignoreを編集
 8. PRを作成
+9. mainブランチに戻る
 
 ## Constraints
 - 既存の公開APIを壊さない
