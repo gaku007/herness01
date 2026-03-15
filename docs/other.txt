@@ -1,0 +1,537 @@
+
+
+
+
+https://openai.com/ja-JP/index/harness-engineering/
+
+ハーネスエンジニアリングを実践したいです。具体的に準備すべき設定を手順を追って教えて
+
+まず前提を整理します。
+**ハーネスエンジニアリング（Harness Engineering）**とは、
+「AIエージェントが正しく動く環境（ハーネス）を設計すること」
+で、エンジニアはコードを書くより AIが間違えない仕組み・環境を作ることに集中するという開発方法です。
+OpenAIの実験では
+3人のエンジニア＋AIエージェントで100万行のコードを生成しましたが、その鍵がこの「ハーネス」です。
+
+ハーネスエンジニアリング実践
+（現実の開発での設定手順）
+実際の環境構築は 6ステップです。
+この順番が一番再現性が高いです。
+
+① Gitリポジトリを作る
+まずAIが作業する「作業空間」を作ります。
+mkdir my-ai-project
+cd my-ai-project
+git init
+推奨構造
+my-ai-project
+ ├ README.md
+ ├ AGENTS.md
+ ├ docs/
+ ├ src/
+ ├ tests/
+ ├ scripts/
+ └ .github/workflows
+理由
+AIは 構造があるほど正しく動くからです。
+② AGENTS.md を作る（最重要）
+これは AI用の取扱説明書です。
+ハーネスエンジニアリングの中核。
+
+AGENTS.md
+例
+# AGENTS.md
+
+## Purpose
+This repository contains a web service.
+
+## Rules
+- Write code in Python
+- Use FastAPI
+- All functions must include tests
+- Do not modify files outside src/
+
+## Workflow
+1. Create issue
+2. Create branch
+3. Implement feature
+4. Add tests
+5. Create PR
+
+## Tools
+- pytest
+- black
+- ruff
+AIはこれを見て動きます。
+もしAIがミスしたら
+AGENTS.mdを修正するのがハーネスエンジニアリングです。
+
+③ CIを設定（AIの失敗を防ぐ）
+AIは必ずミスします。
+だから CIで止める。
+
+GitHub Actions
+
+.github/workflows/test.yml
+例
+name: test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: install
+      run: pip install -r requirements.txt
+
+    - name: lint
+      run: ruff check .
+
+    - name: test
+      run: pytest
+これで
+AIが書くコード
+↓
+CI
+↓
+エラーなら修正
+
+という 自動修正ループになります。
+
+④ AIが使うツールを整備
+AIはツールがあるほど強くなります。
+例
+
+scripts/
+例
+scripts/test.sh
+scripts/lint.sh
+scripts/build.sh
+scripts/run_e2e.sh
+AIは
+bash scripts/test.sh
+のように呼び出します。
+OpenAIでも
+AI専用ツールを用意することが重要とされています。
+
+⑤ テストハーネスを作る
+AIはテストがないと暴走します。
+最低限
+
+tests/
+例
+tests/test_api.py
+tests/test_service.py
+重要ルール
+コード生成 → テスト → 修正
+AIはテストを見て自己修正できます。
+⑥ エージェントループを作る
+AIを回すワークフロー。
+典型パターン
+
+Issue
+ ↓
+AIがブランチ作成
+ ↓
+AIがコード生成
+ ↓
+CI
+ ↓
+AI修正
+ ↓
+PR
+CLIエージェントの例
+ai-agent create-issue
+ai-agent implement
+ai-agent run-tests
+ai-agent create-pr
+OpenAIのCodexも
+この エージェントループで動きます。
+最小構成まとめ
+これだけでハーネスは成立します。
+project
+ ├ AGENTS.md
+ ├ src
+ ├ tests
+ ├ scripts
+ ├ CI
+ └ docs
+実務で重要なルール
+ハーネスエンジニアリングは
+AIを賢くするのではなく
+AIがミスできない環境を作る
+
+です。
+
+ミスしたら
+
+❌ プロンプトを変える
+⭕ 環境を変える
+Gakuさん向け（重要）
+あなたの今の
+CLIエージェント
+issue → branch → PR
+AI駆動開発
+は 完全にハーネスエンジニアリングの方向です。
+むしろかなり近い。
+
+次にやると良いのは
+
+AI用ドキュメント
+AGENTS.md
+です。
+もし希望あれば、
+GakuさんのAI開発スタイルに合わせて
+完全な ハーネス開発テンプレート
+CLIエージェント＋AI開発環境
+AI駆動開発の最強構成（2026版）
+を作ります。
+これ、たぶん
+かなり面白いと思います。
+
+お願い
+
+
+思考時間: 18s
+もちろん。
+Gakuさん向けに、**「今すぐ始められるハーネスエンジニアリング実践手順」**として、設定順に落として書きます。
+OpenAIの記事の要点は、ハーネスエンジニアリングの本質が コードを書くことより、環境・フィードバックループ・制御システムを設計すること にある、という点です。Codex系のエージェントも、基本は「モデルが応答する / ツール呼び出しを要求する → ツール実行 → その結果を再入力して繰り返す」というエージェントループで動きます。 
+
+まず結論
+最初に準備すべき設定は、この7つです。
+リポジトリ構造を固定する
+AI向けの作業ルールを AGENTS.md に書く
+実行コマンドを scripts/ に集約する
+テスト・lint・型チェックをCIで必須化する
+AIが触ってよい範囲を制限する
+Issue → Branch → 実装 → PR の流れを固定する
+失敗したらプロンプトではなくハーネスを直す
+この順でやると、かなり安定します。
+Gakuさんが前に考えていた CLIエージェントで issue→branch→PR を回す構成 と非常に相性が良いです。
+手順1：専用リポジトリを作る
+まずはAIに作業させる“場”を整えます。
+mkdir my-agent-project
+cd my-agent-project
+git init
+mkdir -p src tests scripts docs .github/workflows
+touch README.md AGENTS.md .gitignore
+最低限、こういう形にします。
+my-agent-project/
+├─ src/
+├─ tests/
+├─ scripts/
+├─ docs/
+├─ .github/workflows/
+├─ README.md
+├─ AGENTS.md
+└─ .gitignore
+この「構造の固定」が重要です。OpenAIの記事でも、規律はコードそのものより スキャフォールディング（足場） に現れるとされていて、コードベースの一貫性を保つためのツールやフィードバックループが重要だと説明されています。 
+手順2：AGENTS.md を作る
+ここが中核です。
+AIに対する“現場ルール”を明文化します。
+最初はこれで十分です。
+
+# AGENTS.md
+
+## Goal
+このリポジトリは、FastAPIベースのAPIを開発するためのもの。
+
+## Allowed changes
+- `src/`, `tests/`, `docs/` のみ編集可
+- 依存追加が必要なら理由をPR本文に記載
+- 秘密情報や認証情報は絶対にコミットしない
+
+## Coding rules
+- Python 3.12
+- Ruffでlint
+- pytestでテスト
+- 型ヒント必須
+- 1機能追加ごとに最低1テスト追加
+
+## Workflow
+1. Issueを読む
+2. 専用branchを切る
+3. 実装前に変更方針を `docs/plan.md` に短く書く
+4. 実装
+5. テスト実行
+6. 失敗したら修正
+7. PRを作成
+
+## Constraints
+- 既存の公開APIを壊さない
+- 大規模リファクタは別Issueに分離
+- 1PR 1目的を守る
+
+## Done definition
+- テスト通過
+- lint通過
+- 型チェック通過
+- 変更理由が説明できる
+ポイントは、
+「何をしてよいか」より「何をしてはいけないか」を書くこと です。
+OpenAIのCodexループは、モデルがツール呼び出しを繰り返しながらローカル環境を書き換え得る前提なので、境界条件を明示すること が実運用ではかなり大事です。 
+
+手順3：AIが呼ぶコマンドを scripts/ に統一する
+AIに毎回長いコマンドを考えさせない方が安定します。
+「入口」を固定します。
+touch scripts/setup.sh scripts/lint.sh scripts/test.sh scripts/typecheck.sh
+chmod +x scripts/*.sh
+中身の例です。
+scripts/setup.sh
+
+#!/usr/bin/env bash
+set -euo pipefail
+python -m venv .venv
+source .venv/bin/activate
+pip install -U pip
+pip install -r requirements.txt
+scripts/lint.sh
+#!/usr/bin/env bash
+set -euo pipefail
+ruff check .
+ruff format --check .
+scripts/test.sh
+#!/usr/bin/env bash
+set -euo pipefail
+pytest -q
+scripts/typecheck.sh
+#!/usr/bin/env bash
+set -euo pipefail
+mypy src
+AIには
+「品質確認は必ず scripts/lint.sh scripts/test.sh scripts/typecheck.sh を使う」
+と教えます。
+これがハーネスです。
+つまり、AIの自由度を減らして、正しい軌道に乗りやすくするわけです。
+
+手順4：CIを必須化する
+ローカルでたまたま通った、を防ぎます。
+GitHub Actionsならまずこれで十分です。
+.github/workflows/ci.yml
+
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          pip install -U pip
+          pip install -r requirements.txt
+
+      - name: Lint
+        run: bash scripts/lint.sh
+
+      - name: Type check
+        run: bash scripts/typecheck.sh
+
+      - name: Test
+        run: bash scripts/test.sh
+ここで大事なのは、
+AIが書いたコードを人が読む前に機械が落とす ことです。
+OpenAIの記事でも、重要なのはエージェントを支える フィードバックループ と 制御システム の設計だとされています。CIはその中心です。 
+
+手順5：ブランチ保護を入れる
+GitHub側で次を設定します。
+main への直接push禁止
+PR必須
+CI成功必須
+squash merge推奨
+可能ならレビュー1件必須
+これでAIが暴走しても、本線は守れます。
+ハーネスエンジニアリングは「AIを信用する」のではなく、
+信用しなくても壊れにくい仕組みを先に作る ことです。
+
+手順6：Issue駆動にする
+AIにいきなり「なんか作って」より、Issue起点のほうが圧倒的に安定します。
+Issueテンプレート例:
+
+## 背景
+なぜ必要か
+
+## やること
+- [ ]
+
+## 受け入れ条件
+- [ ]
+- [ ]
+
+## 変更禁止
+- この範囲は触らない
+AIへの依頼文も固定します。
+たとえば毎回こうです。
+
+Issueを読み、AGENTS.mdに従って作業してください。
+最初に実装方針を3〜5行でまとめ、
+その後 branch を切る前提で変更案を出し、
+実装後は lint/test/typecheck の結果を要約してください。
+OpenAIの説明でも、1ターンの中でモデル推論とツール呼び出しが何度も反復されるため、
+最初の指示の質と構造 が後工程の安定性に効きます。 
+手順7：計画ファイルを1枚置く
+AIは途中で目的を見失いやすいので、短い作業計画を残させます。
+docs/plan.md
+
+# Current task plan
+
+## Goal
+ユーザー登録APIにメール形式バリデーションを追加する
+
+## Files to change
+- src/api/users.py
+- tests/test_users.py
+
+## Risks
+- 既存レスポンス形式を変えない
+- 既存テストを壊さない
+これは地味ですが効きます。
+コンテキストが長くなるとエージェントは履歴やツール出力を大量に抱えるので、短い再同期ポイント があるとかなり安定します。OpenAIもコンテキストウィンドウ管理をエージェントの重要な責務として説明しています。 
+手順8：AIの権限を分ける
+できれば作業権限を3段階に分けます。
+レベル1
+読取のみ
+ls, cat, grep, pytest -q など
+レベル2
+限定書込
+src/, tests/, docs/ だけ編集可
+レベル3
+危険操作
+依存追加、削除、大規模rename、DB migration
+危険操作は 人の確認必須 にします。
+
+OpenAIの記事では、エージェントはツール経由でローカル環境を変更し得るので、出力は文章だけではありません。だからこそ、どこまで変更してよいかの制御 が肝です。 
+
+手順9：ログを残す
+最低限、これだけは残すと良いです。
+入力Issue
+AIの方針要約
+実行したスクリプト
+テスト結果
+最終PR要約
+テンプレート例:
+## Agent summary
+- Issue: #12
+- Plan: 入力バリデーション追加
+- Files changed: 2
+- Tests: passed
+- Risks: 既存エラーメッセージ変更あり
+これは後から
+「AIが悪い」ではなく
+「ハーネスのどこが足りなかったか」
+を見返すためです。
+手順10：失敗したら直す場所を決める
+ここが一番大事です。
+AIがミスしたら、直す優先順位はこうです。
+
+AGENTS.md
+scripts/
+CI
+Issueテンプレ
+プロンプト
+つまり、まず環境を直す。
+OpenAIの記事の考え方とも一致しています。ソフトウェア開発の規律は、コード自体より足場・制御・フィードバックに現れる、という話です。 
+いちばん実践的な最小セット
+Gakuさんが最初の1日でやるなら、まずはこれだけで十分です。
+1
+GitHub repoを作る
+2
+以下を置く
+AGENTS.md
+scripts/lint.sh
+scripts/test.sh
+scripts/typecheck.sh
+.github/workflows/ci.yml
+3
+GitHubで branch protection を有効化
+4
+Issueテンプレを作る
+5
+AIへの依頼を固定文にする
+これで、かなり“ハーネスらしい”状態になります。
+
+Codex系でやるなら補足
+OpenAIのCodex CLIまわりでは、Responses APIベースでエージェントループが動き、エンドポイントは設定可能です。ChatGPTログイン時は ChatGPT 側のCodex responses エンドポイント、APIキー利用時は OpenAIの v1/responses を使うと説明されています。 
+なので実運用の考え方としては、
+
+モデルやCLIは交換可能
+でも ハーネスは自前で資産化できる
+と捉えるのが良いです。
+つまり、Gakuさんが今作るべきものは
+「特定モデル専用プロンプト」ではなく、再利用可能な開発足場」 です。
+
+Gakuさん向けのおすすめ構成
+Gakuさんなら、かなり相性が良いのはこれです。
+構成
+
+GitHub
+Issueテンプレ
+AGENTS.md
+Python製CLIエージェント
+scripts/ に品質コマンド集約
+GitHub Actions
+PRテンプレ
+流れ
+Issue作成
+CLIエージェント起動
+branch作成
+plan.md生成
+実装
+lint/test/typecheck
+PR作成
+これはもう、前に話していた
+AI駆動開発MVP の中核そのものです。
+必要なら次に、
+「そのままコピペで使えるハーネスエンジニアリング用テンプレート一式」 を、ファイルごとに全部まとめて作ります。
+
+ハーネスを英語で　手短に
+
+Harness（ハーネス）
+手短に言うと：
+
+制御・補助のための仕組みや枠組み
+元々の意味
+馬具（馬を制御する装具）
+そこから派生して
+機械やソフトウェアを安全に動かすための制御環境
+ソフトウェアでの意味
+システムやAIを安全に動かすための実行環境・制御フレームワーク
+例
+test harness（テスト用実行環境）
+safety harness（安全制御）
+AI harness（AI制御環境）
+一言で言うなら
+Harness = 制御用の枠組み 🧠
+
+
+
+
+=============
+AI開発（ハーネス）でのおすすめ設定
+これが鉄板です。
+✔ Require pull request
+✔ Require status checks
+✔ Require branches up to date
+✔ Require review (1人)
+✔ Block force push
+✔ Block deletion
+これで
+AI → PR作成
+CI → テスト
+人 → merge
+の 安全ループ ができます。
