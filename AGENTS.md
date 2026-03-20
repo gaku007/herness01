@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Goal
-このリポジトリは、FastAPIベースのAPIを開発するためのもの。
+このリポジトリは、React TypeScriptでWebアプリケーションを開発するためのもの。
 
 ## Allowed changes
 - `src/`, `tests/`, `docs/` のみ編集可
@@ -9,9 +9,9 @@
 - 秘密情報や認証情報は絶対にコミットしない
 
 ## Coding rules
-- Python 3.12
-- Ruffでlint
-- pytestでテスト
+- TypeScript 5.x
+- Biomeでlint・format
+- React 18.x（FC型、hooks推奨）
 - 型ヒント必須
 - 1機能追加ごとに最低1テスト追加
 

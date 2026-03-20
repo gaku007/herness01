@@ -1,17 +1,30 @@
 {
   "formatter": {
-    "quoteStyle": "single"
+    "enabled": true,
+    "indentStyle": "tab",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "quoteStyle": "single",
+    "trailingComma": "all",
+    "semicolons": "always"
   },
   "linter": {
+    "enabled": true,
     "rules": {
+      "recommended": true,
       "style": {
-        "useMaxLineLength": {
-          "level": "error",
-          "options": {
-            "maxLineLength": 100
-          }
-        }
+        "useImportType": "warn"
+      },
+      "a11y": {
+        "useButtonType": "error"
       }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "arrowParentheses": "always"
     }
   }
 }
