@@ -1,17 +1,5 @@
 {
   "formatter": {
-    "quoteStyle": "single"
-  },
-  "linter": {
-    "rules": {
-      "style": {
-        "useMaxLineLength": {
-          "level": "error",
-          "options": {
-            "maxLineLength": 100
-          }
-        }
-      }
-    }
+    "enabled": true
   }
 }
