@@ -1,15 +1,15 @@
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash -c 'FILE=$(jq -r .tool_input.file_path); npx biome format --write \"$FILE\"; npx oxlint --fix \"$FILE\" 2>&1 | head -20'"
-          }
-        ]
-      }
-    ]
-  }
+	"hooks": {
+		"PostToolUse": [
+			{
+				"matcher": "Write|Edit",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "bash -c 'FILE=$(jq -r .tool_input.file_path); npx biome format --write \"$FILE\"; npx oxlint --fix \"$FILE\" 2>&1 | head -20'"
+					}
+				]
+			}
+		]
+	}
 }
