@@ -2,26 +2,50 @@ import type React from "react";
 import { useState } from "react";
 
 const HappyApp: React.FC = () => {
-	const [message, setMessage] = useState("");
+	const [message, setMessage] = useState<string>("こんにちは！");
 
-	const handleClick = () => {
+	const getCurrentTimeString = (): string => {
+		const now = new Date();
+		return now.toLocaleString("ja-JP");
+	};
+
+	const handleHeartClick = (): void => {
 		setMessage("幸せが届きました！");
 	};
 
 	return (
-		<div style={{ textAlign: "center", marginTop: "50px" }}>
-			<h1>こんにちは！</h1>
-			<p>現在の日時: {new Date().toLocaleString()}</p>
+		<div
+			style={{
+				textAlign: "center",
+				padding: "2rem",
+				fontFamily: "Arial, sans-serif",
+			}}
+		>
+			<h1 style={{ color: "#ff69b4" }}>💗 makeHappy</h1>
+			<p style={{ fontSize: "1.2rem", color: "#333" }}>{message}</p>
+			<p style={{ fontSize: "0.9rem", color: "#999" }}>
+				現在の日時: {getCurrentTimeString()}
+			</p>
 			<button
-				onClick={handleClick}
 				type="button"
-				style={{ fontSize: "24px", padding: "10px 20px" }}
+				onClick={handleHeartClick}
+				style={{
+					fontSize: "3rem",
+					background: "none",
+					border: "none",
+					cursor: "pointer",
+					padding: "1rem",
+					transition: "transform 0.2s",
+				}}
+				onMouseEnter={(e) => {
+					e.currentTarget.style.transform = "scale(1.2)";
+				}}
+				onMouseLeave={(e) => {
+					e.currentTarget.style.transform = "scale(1)";
+				}}
 			>
 				❤️
 			</button>
-			{message && (
-				<p style={{ marginTop: "20px", fontSize: "18px" }}>{message}</p>
-			)}
 		</div>
 	);
 };
